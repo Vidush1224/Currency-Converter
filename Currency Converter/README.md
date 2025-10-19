@@ -297,12 +297,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## 👨‍💻 Developer
+##  Developer
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-- Website: [yourwebsite.com](https://yourwebsite.com)
+- GitHub: [Vidush1224](https://github.com/Vidush)
+- Email: vidush.skv@gmail.com
 
 ## 🙏 Acknowledgments
 
