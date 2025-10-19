@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter Pro - Real-Time Exchange Rates</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    nav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(45deg, #fff, #a8edea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      cursor: pointer;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 35px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+
+    nav ul li a:hover {
+      color: #fff;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .converter-card, .content-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      color: #333;
+    }
+
+    .converter-card h1, .content-card h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .converter-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .currency-symbol {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    input[type='number'] {
+      width: 100%;
+      font-size: 24px;
+      font-weight: 600;
+      padding: 18px 20px 18px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: #fff;
+    }
+
+    input[type='number']:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    select {
+      width: 100%;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 18px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23667eea' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      padding-right: 50px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .swap-btn {
+      grid-column: span 2;
+      display: flex;
+      justify-content: center;
+      margin: -10px 0;
+    }
+
+    .swap-btn button {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .swap-btn button:hover {
+      transform: rotate(180deg) scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn {
+      grid-column: span 2;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .quick-convert {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      padding: 10px 20px;
+      background: #f5f5f5;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #555;
+      transition: all 0.3s ease;
+    }
+
+    .quick-btn:hover {
+      background: #667eea;
+      color: #fff;
+      border-color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      font-size: 18px;
+      color: #667eea;
+      display: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(102, 126, 234, 0.2);
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      display: none;
+      color: #fff;
+    }
+
+    .result-main {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .result-detail {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    .output {
+      display: none;
+    }
+
+    .output h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .currency-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .currency-item {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .currency-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .currency-code {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .currency-name {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .currency-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .rate-info {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      display: none;
+    }
+
+    /* Rates Page Styles */
+    .rates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .rate-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 2px solid #dee2e6;
+      border-radius: 16px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rate-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .rate-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border-color: #667eea;
+    }
+
+    .rate-pair {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .rate-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .rate-change {
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .rate-change.positive {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .rate-change.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    /* About Page Styles */
+    .about-content {
+      line-height: 1.8;
+      color: #555;
+    }
+
+    .about-content h2 {
+      color: #333;
+      font-size: 28px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .about-content p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin: 30px 0;
+    }
+
+    .feature-box {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid #dee2e6;
+    }
+
+    .feature-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border-color: #667eea;
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .feature-box h3 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .feature-box p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Contact Page Styles */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 30px;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 14px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 25px;
+      border-radius: 16px;
+      border: 2px solid #dee2e6;
+      transition: all 0.3s ease;
+    }
+
+    .info-box:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+    }
+
+    .info-box h3 {
+      color: #667eea;
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-box p {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .converter-form {
+        grid-template-columns: 1fr;
+      }
+
+      .swap-btn, .btn {
+        grid-column: span 1;
+      }
+
+      nav {
+        padding: 20px;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .converter-card, .content-card {
+        padding: 30px 20px;
+      }
+
+      .currency-grid, .rates-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo" onclick="showSection('home')" style="cursor: pointer;">💱 CurrencyPro</div>
+    <ul>
+      <li><a href="#" onclick="showSection('home'); return false;">Home</a></li>
+      <li><a href="#" onclick="showSection('rates'); return false;">Rates</a></li>
+      <li><a href="#" onclick="showSection('about'); return false;">About</a></li>
+      <li><a href="#" onclick="showSection('contact'); return false;">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <!-- HOME SECTION -->
+    <div id="home" class="section active">
+      <div class="converter-card">
+        <h1>Currency Converter</h1>
+        <p class="subtitle">Real-time exchange rates • 150+ currencies • Live updates</p>
+
+        <div class="quick-convert">
+          <button class="quick-btn" onclick="quickConvert(100)">100</button>
+          <button class="quick-btn" onclick="quickConvert(500)">500</button>
+          <button class="quick-btn" onclick="quickConvert(1000)">1,000</button>
+          <button class="quick-btn" onclick="quickConvert(5000)">5,000</button>
+        </div>
+
+        <form class="converter-form">
+          <div class="input-group">
+            <label>From</label>
+            <div class="input-wrapper">
+              <span class="currency-symbol" id="fromSymbol">₹</span>
+              <input type="number" id="quantity" min="0.01" step="0.01" value="1" required>
+            </div>
+            <select id="fromCurrency">
+              <option value="USD">🇺🇸 US Dollar (USD)</option>
+              <option value="EUR">🇪🇺 Euro (EUR)</option>
+              <option value="GBP">🇬🇧 British Pound (GBP)</option>
+              <option value="INR" selected>🇮🇳 Indian Rupee (INR)</option>
+              <option value="JPY">🇯🇵 Japanese Yen (JPY)</option>
+              <option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
+              <option value="CAD">🇨🇦 Canadian Dollar (CAD)</option>
+              <option value="CHF">🇨🇭 Swiss Franc (CHF)</option>
+              <option value="CNY">🇨🇳 Chinese Yuan (CNY)</option>
+              <option value="SEK">🇸🇪 Swedish Krona (SEK)</option>
+              <option value="NZD">🇳🇿 New Zealand Dollar (NZD)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>To</label>
+            <div class="input-wrapper">
+              <span class="currency-symbol" id="toSymbol">$</span>
+              <input type="number" id="result" readonly style="background: #f8f9fa; cursor: not-allowed;">
+            </div>
+            <select id="toCurrency">
+              <option value="USD" selected>🇺🇸 US Dollar (USD)</option>
+              <option value="EUR">🇪🇺 Euro (EUR)</option>
+              <option value="GBP">🇬🇧 British Pound (GBP)</option>
+              <option value="INR">🇮🇳 Indian Rupee (INR)</option>
+              <option value="JPY">🇯🇵 Japanese Yen (JPY)</option>
+              <option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
+              <option value="CAD">🇨🇦 Canadian Dollar (CAD)</option>
+              <option value="CHF">🇨🇭 Swiss Franc (CHF)</option>
+              <option value="CNY">🇨🇳 Chinese Yuan (CNY)</option>
+              <option value="SEK">🇸🇪 Swedish Krona (SEK)</option>
+              <option value="NZD">🇳🇿 New Zealand Dollar (NZD)</option>
+            </select>
+          </div>
+
+          <div class="swap-btn">
+            <button type="button" onclick="swapCurrencies()">⇄</button>
+          </div>
+
+          <button class="btn" type="submit">Convert Now</button>
+        </form>
+
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Fetching latest exchange rates...</div>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div class="result-main" id="resultMain"></div>
+          <div class="result-detail" id="resultDetail"></div>
+        </div>
+
+        <div class="rate-info" id="rateInfo"></div>
+
+        <div class="output">
+          <h2>All Currency Rates</h2>
+          <div class="currency-grid" id="currencyGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RATES SECTION -->
+    <div id="rates" class="section">
+      <div class="content-card">
+        <h1>Live Exchange Rates</h1>
+        <p class="subtitle">Updated in real-time • Compare multiple currencies</p>
+        
+        <div class="rates-grid" id="ratesGrid">
+          <div class="rate-card">
+            <div class="rate-pair">USD → EUR</div>
+            <div class="rate-value">0.92</div>
+            <span class="rate-change positive">↑ 0.05%</span>
+          </div>
+          <div class="rate-card">
+            <div class="rate-pair">USD → GBP</div>
+            <div class="rate-value">0.79</div>
+            <span class="rate-change negative">↓ 0.12%</span>
+          </div>
+          <div class="rate-card">
+            <div class="rate-pair">USD → INR</div>
+            <div class="rate-value">83.15</div>
+            <span class="rate-change positive">↑ 0.08%</span>
+          </div>
+          <div class="rate-card">
+            <div class="rate-pair">USD → JPY</div>
+            <div class="rate-value">149.85</div>
+            <span class="rate-change positive">↑ 0.15%</span>
+          </div>
+          <div class="rate-card">
+            <div class="rate-pair">EUR → GBP</div>
+            <div class="rate-value">0.86</div>
+            <span class="rate-change negative">↓ 0.03%</span>
+          </div>
+          <div class="rate-card">
+            <div class="rate-pair">GBP → INR</div>
+            <div class="rate-value">105.23</div>
+            <span class="rate-change positive">↑ 0.18%</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 12px; border-left: 4px solid #2196F3;">
+          <h3 style="color: #333; margin-bottom: 10px;">📊 Market Insights</h3>
+          <p style="color: #555; line-height: 1.6;">Exchange rates are updated every minute from reliable financial data sources. Rates shown are indicative and may vary slightly from actual transaction rates. For large transactions, please consult with your financial institution.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT SECTION -->
+    <div id="about" class="section">
+      <div class="content-card">
+        <h1>About CurrencyPro</h1>
+        <p class="subtitle">Your trusted partner for currency conversion</p>
+        
+        <div class="about-content">
+          <p>CurrencyPro is a modern, fast, and reliable currency converter that provides real-time exchange rates for over 150 currencies worldwide. Whether you're traveling, shopping online, or conducting international business, we've got you covered.</p>
+
+          <h2>Why Choose CurrencyPro?</h2>
+          
+          <div class="features-grid">
+            <div class="feature-box">
+              <div class="feature-icon">⚡</div>
+              <h3>Lightning Fast</h3>
+              <p>Get instant conversion results with our optimized API integration and smart caching system.</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">🎯</div>
+              <h3>Accurate Rates</h3>
+              <p>Real-time data from trusted financial sources ensures you always get the most accurate rates.</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">🌍</div>
+              <h3>150+ Currencies</h3>
+              <p>Support for all major world currencies and many exotic ones too.</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">📱</div>
+              <h3>Mobile Friendly</h3>
+              <p>Fully responsive design works perfectly on all devices - desktop, tablet, and mobile.</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">🔒</div>
+              <h3>Secure & Private</h3>
+              <p>We don't store any of your personal data. Your conversions are completely private.</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">🆓</div>
+              <h3>100% Free</h3>
+              <p>No hidden fees, no registration required. Just pure, unlimited conversions.</p>
+            </div>
+          </div>
+
+          <h2>Our Mission</h2>
+          <p>We believe that currency conversion should be simple, fast, and accessible to everyone. Our mission is to provide the most user-friendly and reliable currency converter on the web, helping millions of users make informed financial decisions every day.</p>
+
+          <h2>Technology</h2>
+          <p>Built with modern web technologies and powered by enterprise-grade APIs, CurrencyPro delivers exceptional performance and reliability. We continuously update our platform to bring you the best user experience possible.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT SECTION -->
+    <div id="contact" class="section">
+      <div class="content-card">
+        <h1>Get In Touch</h1>
+        <p class="subtitle">We'd love to hear from you!</p>
+
+        <div class="contact-grid">
+          <div class="contact-form">
+            <form onsubmit="handleContactSubmit(event)">
+              <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" required placeholder="John Doe">
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" required placeholder="john@example.com">
+              </div>
+              <div class="form-group">
+                <label>Subject</label>
+                <input type="text" required placeholder="How can we help?">
+              </div>
+              <div class="form-group">
+                <label>Message</label>
+                <textarea required placeholder="Tell us more about your inquiry..."></textarea>
+              </div>
+              <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+          </div>
+
+          <div class="contact-info">
+            <div class="info-box">
+              <h3>📧 Email</h3>
+              <p>support@currencypro.com<br>business@currencypro.com</p>
+            </div>
+
+            <div class="info-box">
+              <h3>📱 Phone</h3>
+              <p>+1 (555) 123-4567<br>Mon-Fri: 9AM - 6PM EST</p>
+            </div>
+
+            <div class="info-box">
+              <h3>📍 Address</h3>
+              <p>123 Finance Street<br>New York, NY 10001<br>United States</p>
+            </div>
+
+            <div class="info-box">
+              <h3>💬 Social Media</h3>
+              <p>Follow us for updates and tips:<br>
+              Twitter: @CurrencyPro<br>
+              LinkedIn: /company/currencypro</p>
+            </div>
+
+            <div class="info-box">
+              <h3>⏰ Response Time</h3>
+              <p>We typically respond within 24 hours on business days. For urgent matters, please call us directly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 CurrencyPro. All rights reserved. | Powered by CurrencyAPI | <a href="#" style="color: rgba(255,255,255,0.8); text-decoration: none;" onclick="showSection('about'); return false;">Privacy Policy</a> | <a href="#" style="color: rgba(255,255,255,0.8); text-decoration: none;" onclick="showSection('contact'); return false;">Terms of Service</a>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
